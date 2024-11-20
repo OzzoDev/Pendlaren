@@ -50,6 +50,7 @@ function initSearch() {
     const searchQuery = removeDoubleSpaces(searchInput.value.trim());
     if (searchQuery !== "") {
       stops.forEach((stop) => (stop.visible = true));
+      renderClosestStops(stops);
       cancelSearchBtn.setAttribute("class", "hidden");
       searchInput.value = "";
     }
