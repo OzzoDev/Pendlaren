@@ -13,6 +13,7 @@ const timeTablePagePath = "stop.html";
 let latitude;
 let longitude;
 let stops = [];
+let unsortedStops = [];
 
 document.addEventListener("DOMContentLoaded", () => {
   init();
@@ -21,6 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
 function init() {
   getLocation();
   initSearch();
+  initSort();
 }
 
 function initSearch() {
@@ -51,6 +53,26 @@ function initSearch() {
       cancelSearchBtn.setAttribute("class", "hidden");
       searchInput.value = "";
     }
+  });
+}
+
+function initSort() {
+  const sortContainer = document.getElementById("sortContainer");
+  const sortBtns = Array.from(sortContainer.getElementsByTagName("input"));
+
+  sortBtns.forEach((btn) => {
+    const index = Array.from(sortBtns).indexOf(btn);
+    btn.addEventListener("click", () => {
+      switch (index) {
+        case 0:
+          stops = unsortedStops;
+          break;
+        case 1:
+          stops = stops.sort((a, b) => a.name.localeCompare(b.name));
+          break;
+      }
+      renderClosestStops(stops);
+    });
   });
 }
 
@@ -158,7 +180,8 @@ function useFetchedStops(prevLat, prevLong) {
         const closestStop = findClosestStops(latitude, longitude, stops);
         console.log("Data: ", closestStop);
         save(stopsLocalStorageKey, closestStop);
-        modifyStopsArray(closestStop);
+        stops = modifyStopsArray(closestStop);
+        unsortedStops = modifyStopsArray(closestStop);
         renderClosestStops(stops);
       });
       console.log("Data fetched");
@@ -166,6 +189,7 @@ function useFetchedStops(prevLat, prevLong) {
       console.log("Data loaded");
       const closestStop = findClosestStops(latitude, longitude, loadStops);
       stops = modifyStopsArray(closestStop);
+      unsortedStops = modifyStopsArray(closestStop);
       renderClosestStops(stops);
     }
   }
