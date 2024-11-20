@@ -192,7 +192,7 @@ function extractName(name) {
 function modifyStopsArray(stops) {
   const stopsName = stops.map((stop) => stop.StopLocation.name);
   const wordToClean = mostOccurringWord(stopsName);
-  const cleaned = stops.map((stop) => ({ name: cleanString(stop.StopLocation.name, wordToClean).trim(), id: stop.StopLocation.extId, visible: true }));
+  const cleaned = stops.map((stop) => ({ name: cleanString(stop.StopLocation.name, wordToClean).trim(), extId: stop.StopLocation.extId, visible: true }));
   return cleaned;
 }
 
