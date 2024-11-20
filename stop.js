@@ -60,6 +60,19 @@ function extractName(name) {
   return name.split(".")[0].split(" (")[0];
 }
 
+function getDate(str) {
+  const date = str.split("|");
+  return date[date.length - 1];
+}
+
+function getDirection(str) {
+  return str.split(" (")[0];
+}
+
+function getBus(str) {
+  return str.split("- ")[1].split(" ")[1];
+}
+
 function redriect(path) {
   window.location.href = path;
 }
