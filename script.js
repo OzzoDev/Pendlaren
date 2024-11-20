@@ -3,6 +3,10 @@ const apiKey = "c1f80921-2d9d-484a-b297-a221cdd62746";
 const output = document.getElementById("output");
 const closestStopsContainer = document.getElementById("closestStopsContainer");
 
+const latitudeLocalStorageKey = "latitude";
+const longitudeLocalStorageKey = "lonitude";
+const stopsLocalStorageKey = "stops";
+
 let latitude;
 let longitude;
 
@@ -38,8 +42,20 @@ function getLocation() {
 function success(position) {
   latitude = position.coords.latitude;
   longitude = position.coords.longitude;
+
+  const loadLatitude = load(latitudeLocalStorageKey);
+  const loadLongitude = load(longitudeLocalStorageKey);
+
+  if (!loadLatitude || loadLatitude !== latitude) {
+    save(latitudeLocalStorageKey, latitude);
+  }
+
+  if (!loadLongitude || loadLongitude !== longitude) {
+    save(longitudeLocalStorageKey, longitude);
+  }
+
   output.textContent = `Latitude: ${latitude}, Longitude: ${longitude}`;
-  useFetchedStops();
+  useFetchedStops(loadLatitude, loadLongitude);
 }
 
 function error(err) {
@@ -59,7 +75,7 @@ function error(err) {
   }
 }
 
-async function fetchStops(lat, long, maxNo = 100, radius = 100000, lang = "en") {
+async function fetchStops(lat, long, maxNo = 100, radius = 10000, lang = "sv") {
   const baseUrl = "https://api.resrobot.se/v2.1/location.nearbystops";
   const params = new URLSearchParams({
     originCoordLat: lat,
@@ -78,7 +94,6 @@ async function fetchStops(lat, long, maxNo = 100, radius = 100000, lang = "en") 
     if (!response.ok) {
       throw new Error(`Network error! Status: ${response.status}`);
     }
-    console.log("res: ", response);
     const data = await response.json();
     console.log("Data: ", data.stopLocationOrCoordLocation);
     return data.stopLocationOrCoordLocation;
@@ -88,14 +103,24 @@ async function fetchStops(lat, long, maxNo = 100, radius = 100000, lang = "en") 
   }
 }
 
-function useFetchedStops() {
+function useFetchedStops(prevLat, prevLong) {
   if (latitude && longitude) {
-    fetchStops(latitude, longitude).then((stops) => {
-      //   console.log("Nearby stops: ", stops);
-      const closestStop = findClosestStops(latitude, longitude, stops);
-      //   console.log("Closest Stop:", closestStop);
+    const loadStops = load(stopsLocalStorageKey);
+    const loadLatitude = load(latitudeLocalStorageKey);
+    const loadLongitude = load(longitudeLocalStorageKey);
+
+    if (!loadStops || loadLatitude !== prevLat || loadLongitude !== prevLong) {
+      fetchStops(latitude, longitude).then((stops) => {
+        const closestStop = findClosestStops(latitude, longitude, stops);
+        save(stopsLocalStorageKey, closestStop);
+        renderClosestStops(closestStop);
+      });
+      console.log("Data fetched");
+    } else {
+      console.log("Data loaded");
+      const closestStop = findClosestStops(latitude, longitude, loadStops);
       renderClosestStops(closestStop);
-    });
+    }
   }
 }
 
@@ -145,4 +170,12 @@ function findClosestStops(latitude, longitude, stops) {
   stopsWithDistances.sort((a, b) => a.distance - b.distance);
 
   return stopsWithDistances.map((item) => item.stop);
+}
+
+function save(key, value) {
+  localStorage.setItem(key, JSON.stringify(value));
+}
+
+function load(key) {
+  return JSON.parse(localStorage.getItem(key));
 }
