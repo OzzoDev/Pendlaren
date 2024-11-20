@@ -6,6 +6,10 @@ const closestStopsContainer = document.getElementById("closestStopsContainer");
 const latitudeLocalStorageKey = "latitude";
 const longitudeLocalStorageKey = "lonitude";
 const stopsLocalStorageKey = "stops";
+const stopNameLocalStorageKey = "stopName";
+const stopIDLocalStorageKey = "stopID";
+
+const timeTablePagePath = "timeTable.html";
 
 let latitude;
 let longitude;
@@ -16,17 +20,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function init() {
   getLocation();
-  //   useFetchedStops();
 }
 
 function renderClosestStops(stops) {
   closestStopsContainer.innerHTML = "";
-  const stopsName = stops.map((stop) => stop.StopLocation.name);
 
-  stopsName.forEach((stop) => {
-    const justName = stop.split(".")[0].split(" (")[0];
+  stops.forEach((stop) => {
+    const stopName = stop.StopLocation.name.split(".")[0].split(" (")[0];
+    const stopID = stop.StopLocation.extId;
     const li = document.createElement("li");
-    li.innerText = justName;
+    li.innerText = stopName;
+    li.addEventListener("click", () => {
+      save(stopNameLocalStorageKey, stopName);
+      save(stopIDLocalStorageKey, stopID);
+      setTimeout(() => {
+        // redriect(timeTablePagePath);
+      }, 100);
+    });
     closestStopsContainer.appendChild(li);
   });
 }
@@ -112,6 +122,7 @@ function useFetchedStops(prevLat, prevLong) {
     if (!loadStops || loadLatitude !== prevLat || loadLongitude !== prevLong) {
       fetchStops(latitude, longitude).then((stops) => {
         const closestStop = findClosestStops(latitude, longitude, stops);
+        console.log("Data: ", closestStop);
         save(stopsLocalStorageKey, closestStop);
         renderClosestStops(closestStop);
       });
@@ -119,6 +130,7 @@ function useFetchedStops(prevLat, prevLong) {
     } else {
       console.log("Data loaded");
       const closestStop = findClosestStops(latitude, longitude, loadStops);
+      console.log("Data: ", closestStop);
       renderClosestStops(closestStop);
     }
   }
@@ -170,6 +182,10 @@ function findClosestStops(latitude, longitude, stops) {
   stopsWithDistances.sort((a, b) => a.distance - b.distance);
 
   return stopsWithDistances.map((item) => item.stop);
+}
+
+function redriect(path) {
+  window.location.href = path;
 }
 
 function save(key, value) {
