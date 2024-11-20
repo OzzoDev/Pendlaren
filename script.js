@@ -1,4 +1,3 @@
-// Key: c1f80921-2d9d-484a-b297-a221cdd62746
 const apiKey = "c1f80921-2d9d-484a-b297-a221cdd62746";
 const output = document.getElementById("output");
 const closestStopsContainer = document.getElementById("closestStopsContainer");
@@ -9,7 +8,7 @@ const stopsLocalStorageKey = "stops";
 const stopNameLocalStorageKey = "stopName";
 const stopIDLocalStorageKey = "stopID";
 
-const timeTablePagePath = "timeTable.html";
+const timeTablePagePath = "stop.html";
 
 let latitude;
 let longitude;
@@ -26,7 +25,7 @@ function renderClosestStops(stops) {
   closestStopsContainer.innerHTML = "";
 
   stops.forEach((stop) => {
-    const stopName = stop.StopLocation.name.split(".")[0].split(" (")[0];
+    const stopName = extractName(stop.StopLocation.name);
     const stopID = stop.StopLocation.extId;
     const li = document.createElement("li");
     li.innerText = stopName;
@@ -34,7 +33,7 @@ function renderClosestStops(stops) {
       save(stopNameLocalStorageKey, stopName);
       save(stopIDLocalStorageKey, stopID);
       setTimeout(() => {
-        // redriect(timeTablePagePath);
+        redriect(timeTablePagePath);
       }, 100);
     });
     closestStopsContainer.appendChild(li);
@@ -182,6 +181,10 @@ function findClosestStops(latitude, longitude, stops) {
   stopsWithDistances.sort((a, b) => a.distance - b.distance);
 
   return stopsWithDistances.map((item) => item.stop);
+}
+
+function extractName(name) {
+  return name.split(".")[0].split(" (")[0];
 }
 
 function redriect(path) {
