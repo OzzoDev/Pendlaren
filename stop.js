@@ -76,16 +76,20 @@ async function fetchStop(stopID) {
 function assignFetchStops(stopID) {
   fetchStop(stopID)
     .then((stop) => {
-      currentStop = stop.Departure.map((stop) => {
-        const time = stop.time;
-        const date = stop.JourneyDetailRef.ref;
-        const name = stop.name;
-        const direction = stop.direction;
-        return { time: time, date: date, name: name, direction: direction };
-      });
-      currentStop = modifyStopArray(currentStop);
-      save(currentStopKey, { stop: currentStop, fetchAt: new Date() });
-      render(currentStop);
+      if (stop && stop.Departure) {
+        currentStop = stop.Departure.map((stop) => {
+          const time = stop.time;
+          const date = stop.JourneyDetailRef.ref;
+          const name = stop.name;
+          const direction = stop.direction;
+          return { time: time, date: date, name: name, direction: direction };
+        });
+        currentStop = modifyStopArray(currentStop);
+        save(currentStopKey, { stop: currentStop, fetchAt: new Date() });
+        render(currentStop);
+      } else {
+        console.log("No depatures");
+      }
     })
     .catch((error) => {
       console.error("Error fetching stop:", error);

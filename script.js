@@ -14,6 +14,7 @@ let latitude;
 let longitude;
 let stops = [];
 let unsortedStops = [];
+let inputs = [];
 
 document.addEventListener("DOMContentLoaded", () => {
   init();
@@ -28,6 +29,8 @@ function init() {
 function initSearch() {
   const searchInput = document.getElementById("searchInput");
   const cancelSearchBtn = document.getElementById("cancelSearchBtn");
+
+  inputs.push(searchInput);
 
   searchInput.addEventListener("input", () => {
     const searchQuery = removeDoubleSpaces(searchInput.value.trim());
@@ -287,11 +290,16 @@ function capitalize(str) {
   return str[0].toUpperCase() + str.slice(1);
 }
 
+function clearInputs() {
+  inputs.forEach((input) => (input.value = ""));
+}
+
 function removeDoubleSpaces(str) {
   return str.replace(/\s{2,}/g, " ");
 }
 
 function redriect(path) {
+  clearInputs();
   window.location.href = path;
 }
 
