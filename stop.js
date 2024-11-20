@@ -13,7 +13,6 @@ let currentStop;
 
 document.addEventListener("DOMContentLoaded", () => {
   init();
-  console.log(new Date());
 });
 
 function init() {
@@ -84,6 +83,7 @@ function assignFetchStops(stopID) {
         const direction = stop.direction;
         return { time: time, date: date, name: name, direction: direction };
       });
+      currentStop = modifyStopArray(currentStop);
       save(currentStopKey, { stop: currentStop, fetchAt: new Date() });
       render(currentStop);
     })
@@ -144,6 +144,44 @@ function compareWithTempDate(date1, date2, timeLimitInSeconds) {
   tempDate.setSeconds(tempDate.getSeconds() + timeLimitInSeconds);
 
   return d1 > tempDate;
+}
+
+function modifyStopArray(stop) {
+  const stopsName = stop.map((stop) => stop.direction);
+  const wordToClean = mostOccurringWord(stopsName);
+  const cleaned = stop.map((stop) => ({ ...stop, direction: cleanString(stop.direction, wordToClean).trim() }));
+  return cleaned;
+}
+
+function cleanString(str, wordToClean) {
+  const regex = new RegExp(wordToClean, "gi");
+  return str.replace(regex, "");
+}
+
+function mostOccurringWord(strings) {
+  const wordCount = {};
+
+  strings.forEach((string) => {
+    const words = string.split(/\s+/);
+    words.forEach((word) => {
+      const cleanedWord = word.toLowerCase().replace(/[^\wåäöÅÄÖ]/g, "");
+      if (cleanedWord && cleanedWord.toLowerCase() >= "a" && cleanedWord.toLowerCase() <= "z") {
+        wordCount[cleanedWord] = (wordCount[cleanedWord] || 0) + 1;
+      }
+    });
+  });
+
+  let maxCount = 0;
+  let mostFrequentWord = "";
+
+  for (const [word, count] of Object.entries(wordCount)) {
+    if (count > maxCount) {
+      maxCount = count;
+      mostFrequentWord = word;
+    }
+  }
+
+  return mostFrequentWord;
 }
 
 function save(key, value) {

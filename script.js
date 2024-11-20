@@ -179,15 +179,12 @@ function useFetchedStops(prevLat, prevLong) {
     if (!loadStops || loadLatitude !== prevLat || loadLongitude !== prevLong) {
       fetchStops(latitude, longitude).then((stops) => {
         const closestStop = findClosestStops(latitude, longitude, stops);
-        console.log("Data: ", closestStop);
         save(stopsLocalStorageKey, closestStop);
         stops = modifyStopsArray(closestStop);
         unsortedStops = modifyStopsArray(closestStop);
         renderClosestStops(stops);
       });
-      console.log("Data fetched");
     } else {
-      console.log("Data loaded");
       const closestStop = findClosestStops(latitude, longitude, loadStops);
       stops = modifyStopsArray(closestStop);
       unsortedStops = modifyStopsArray(closestStop);
