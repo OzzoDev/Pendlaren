@@ -79,6 +79,60 @@ function useFetchedStops() {
   if (latitude && longitude) {
     fetchStops(latitude, longitude).then((stops) => {
       console.log("Nearby stops: ", stops);
+      const closestStop = findClosestStops(latitude, longitude, stops);
+      console.log("Closest Stop:", closestStop);
     });
   }
+}
+
+function extractCoordinates(stopId) {
+  const parts = stopId.split("@");
+  if (parts.length < 4) {
+    console.error("Invalid stopId format:", stopId);
+    return { lat: null, lon: null };
+  }
+  const x = parseFloat(parts[2].split("=")[1]);
+  const y = parseFloat(parts[3].split("=")[1]);
+  return { lat: y, lon: x };
+}
+
+function haversineDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371e3;
+  const rad1 = (lat1 * Math.PI) / 180;
+  const rad2 = (lat2 * Math.PI) / 180;
+  const deltaLat = ((lat2 - lat1) * Math.PI) / 180;
+  const deltaLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a = Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) + Math.cos(rad1) * Math.cos(rad2) * Math.sin(deltaLon / 2) * Math.sin(deltaLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+function findClosestStops(latitude, longitude, stops) {
+  const stopsWithDistances = [];
+
+  console.log("Len: ", stops.length);
+
+  for (const stop of stops) {
+    console.log("Processing stop:", stop.StopLocation.id);
+    const { lat, lon } = extractCoordinates(stop.StopLocation.id);
+
+    if (lat === null || lon === null) {
+      console.error("Invalid coordinates for stop:", stop.StopLocation.id);
+      continue;
+    }
+
+    const distance = haversineDistance(latitude, longitude, lat, lon);
+    console.log("Distance to stop:", stop.StopLocation.id, "is", distance);
+
+    if (isNaN(distance)) {
+      console.error("Distance calculation resulted in NaN for stop:", stop.StopLocation.id);
+      continue;
+    }
+
+    stopsWithDistances.push({ stop, distance });
+  }
+
+  stopsWithDistances.sort((a, b) => a.distance - b.distance);
+
+  return stopsWithDistances.map((item) => item.stop);
 }
