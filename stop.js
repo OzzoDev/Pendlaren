@@ -1,3 +1,6 @@
+const timeTable = document.getElementById("timeTable");
+const stopNameHeader = document.getElementById("stop");
+
 const apiKey = "c1f80921-2d9d-484a-b297-a221cdd62746";
 const stopNameLocalStorageKey = "stopName";
 const stopIDLocalStorageKey = "stopID";
@@ -14,12 +17,45 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function init() {
   const stopID = load(stopIDLocalStorageKey);
+  const stopName = load(stopNameLocalStorageKey);
   if (stopID) {
-    currentStopKey.concat(stopID);
+    stopNameHeader.innerText = stopName;
+    currentStopKey += stopID;
     useFetchedStop(stopID);
   } else {
     console.log("No Id found");
   }
+}
+
+function render(stop) {
+  timeTable.innerHTML = "";
+
+  const depatures = stop.Departure;
+
+  depatures.forEach((depature) => {
+    const li = document.createElement("li");
+    const timeEl = document.createElement("p");
+    const dateEl = document.createElement("p");
+    const busEl = document.createElement("p");
+    const directionEl = document.createElement("p");
+
+    const time = extractDepatureTime(depature.time);
+    const date = extractDate(depature.JourneyDetailRef.ref);
+    const bus = extractBus(depature.name);
+    const direction = extractDirection(depature.direction);
+
+    timeEl.innerText = `${time}`;
+    dateEl.innerText = `${date}`;
+    busEl.innerText = `Linje - ${bus}`;
+    directionEl.innerText = `Riktning - ${direction}`;
+
+    li.appendChild(timeEl);
+    li.appendChild(dateEl);
+    li.appendChild(busEl);
+    li.appendChild(directionEl);
+
+    timeTable.appendChild(li);
+  });
 }
 
 async function fetchStop(stopID) {
@@ -40,19 +76,22 @@ async function fetchStop(stopID) {
 }
 
 function useFetchedStop(stopID) {
+  console.log("CurrKey: ", currentStopKey);
   const loadStop = load(currentStopKey);
   if (!loadStop) {
     fetchStop(stopID)
       .then((stop) => {
         currentStop = stop;
         save(currentStopKey, currentStop);
+        render(currentStop);
       })
       .catch((error) => {
         console.error("Error fetching stop:", error);
       });
   } else {
     currentStop = loadStop;
-    console.log("Data, loaded", currentStop);
+    console.log("Data loaded", currentStop);
+    render(currentStop);
   }
 }
 
@@ -60,16 +99,21 @@ function extractName(name) {
   return name.split(".")[0].split(" (")[0];
 }
 
-function getDate(str) {
+function extractDepatureTime(str) {
+  const time = str.split(":");
+  return `${time[0]}:${time[1]}`;
+}
+
+function extractDate(str) {
   const date = str.split("|");
   return date[date.length - 1];
 }
 
-function getDirection(str) {
+function extractDirection(str) {
   return str.split(" (")[0];
 }
 
-function getBus(str) {
+function extractBus(str) {
   return str.split("- ")[1].split(" ")[1];
 }
 
