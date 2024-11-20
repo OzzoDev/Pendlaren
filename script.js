@@ -12,6 +12,7 @@ const timeTablePagePath = "stop.html";
 
 let latitude;
 let longitude;
+let stops = [];
 
 document.addEventListener("DOMContentLoaded", () => {
   init();
@@ -25,8 +26,8 @@ function renderClosestStops(stops) {
   closestStopsContainer.innerHTML = "";
 
   stops.forEach((stop) => {
-    const stopName = extractName(stop.StopLocation.name);
-    const stopID = stop.StopLocation.extId;
+    const stopName = extractName(stop.name);
+    const stopID = stop.extId;
     const li = document.createElement("li");
     li.innerText = stopName;
     li.addEventListener("click", () => {
@@ -123,14 +124,15 @@ function useFetchedStops(prevLat, prevLong) {
         const closestStop = findClosestStops(latitude, longitude, stops);
         console.log("Data: ", closestStop);
         save(stopsLocalStorageKey, closestStop);
-        renderClosestStops(closestStop);
+        modifyStopsArray(closestStop);
+        renderClosestStops(stops);
       });
       console.log("Data fetched");
     } else {
       console.log("Data loaded");
       const closestStop = findClosestStops(latitude, longitude, loadStops);
-      console.log("Data: ", closestStop);
-      renderClosestStops(closestStop);
+      stops = modifyStopsArray(closestStop);
+      renderClosestStops(stops);
     }
   }
 }
@@ -185,6 +187,48 @@ function findClosestStops(latitude, longitude, stops) {
 
 function extractName(name) {
   return name.split(".")[0].split(" (")[0];
+}
+
+function modifyStopsArray(stops) {
+  const stopsName = stops.map((stop) => stop.StopLocation.name);
+  const wordToClean = mostOccurringWord(stopsName);
+  const cleaned = stops.map((stop) => ({ name: cleanString(stop.StopLocation.name, wordToClean).trim(), id: stop.StopLocation.extId, visible: true }));
+  return cleaned;
+}
+
+function mostOccurringWord(strings) {
+  const wordCount = {};
+
+  strings.forEach((string) => {
+    const words = string.split(/\s+/);
+    words.forEach((word) => {
+      const cleanedWord = word.toLowerCase().replace(/[^\wåäöÅÄÖ]/g, "");
+      if (cleanedWord) {
+        wordCount[cleanedWord] = (wordCount[cleanedWord] || 0) + 1;
+      }
+    });
+  });
+
+  let maxCount = 0;
+  let mostFrequentWord = "";
+
+  for (const [word, count] of Object.entries(wordCount)) {
+    if (count > maxCount) {
+      maxCount = count;
+      mostFrequentWord = word;
+    }
+  }
+
+  return mostFrequentWord;
+}
+
+function cleanString(str, wordToClean) {
+  const regex = new RegExp(wordToClean, "gi");
+  return str.replace(regex, "");
+}
+
+function capitalize(str) {
+  return str[0].toUpperCase() + str.slice(1);
 }
 
 function redriect(path) {
