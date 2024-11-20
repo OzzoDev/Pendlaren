@@ -1,6 +1,7 @@
 // Key: c1f80921-2d9d-484a-b297-a221cdd62746
 const apiKey = "c1f80921-2d9d-484a-b297-a221cdd62746";
 const output = document.getElementById("output");
+const closestStopsContainer = document.getElementById("closestStopsContainer");
 
 let latitude;
 let longitude;
@@ -12,6 +13,18 @@ document.addEventListener("DOMContentLoaded", () => {
 function init() {
   getLocation();
   //   useFetchedStops();
+}
+
+function renderClosestStops(stops) {
+  closestStopsContainer.innerHTML = "";
+  const stopsName = stops.map((stop) => stop.StopLocation.name);
+
+  stopsName.forEach((stop) => {
+    const justName = stop.split(".")[0].split(" (")[0];
+    const li = document.createElement("li");
+    li.innerText = justName;
+    closestStopsContainer.appendChild(li);
+  });
 }
 
 function getLocation() {
@@ -78,9 +91,10 @@ async function fetchStops(lat, long, maxNo = 100, radius = 100000, lang = "en") 
 function useFetchedStops() {
   if (latitude && longitude) {
     fetchStops(latitude, longitude).then((stops) => {
-      console.log("Nearby stops: ", stops);
+      //   console.log("Nearby stops: ", stops);
       const closestStop = findClosestStops(latitude, longitude, stops);
-      console.log("Closest Stop:", closestStop);
+      //   console.log("Closest Stop:", closestStop);
+      renderClosestStops(closestStop);
     });
   }
 }
@@ -110,10 +124,7 @@ function haversineDistance(lat1, lon1, lat2, lon2) {
 function findClosestStops(latitude, longitude, stops) {
   const stopsWithDistances = [];
 
-  console.log("Len: ", stops.length);
-
   for (const stop of stops) {
-    console.log("Processing stop:", stop.StopLocation.id);
     const { lat, lon } = extractCoordinates(stop.StopLocation.id);
 
     if (lat === null || lon === null) {
@@ -122,7 +133,6 @@ function findClosestStops(latitude, longitude, stops) {
     }
 
     const distance = haversineDistance(latitude, longitude, lat, lon);
-    console.log("Distance to stop:", stop.StopLocation.id, "is", distance);
 
     if (isNaN(distance)) {
       console.error("Distance calculation resulted in NaN for stop:", stop.StopLocation.id);
