@@ -20,24 +20,58 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function init() {
   getLocation();
+  initSearch();
+}
+
+function initSearch() {
+  const searchInput = document.getElementById("searchInput");
+  const cancelSearchBtn = document.getElementById("cancelSearchBtn");
+
+  searchInput.addEventListener("input", () => {
+    const searchQuery = removeDoubleSpaces(searchInput.value.trim());
+    searchInput.value = searchQuery;
+    if (searchQuery === "") {
+      stops.forEach((stop) => (stop.visible = true));
+      if (!cancelSearchBtn.getAttribute("class")) {
+        cancelSearchBtn.setAttribute("class", "hidden");
+      }
+    } else {
+      stops.forEach((stop) => (stop.name.toLowerCase().startsWith(searchQuery) ? (stop.visible = true) : (stop.visible = false)));
+      if (cancelSearchBtn.getAttribute("class")) {
+        cancelSearchBtn.removeAttribute("class");
+      }
+    }
+    renderClosestStops(stops);
+  });
+
+  cancelSearchBtn.addEventListener("click", () => {
+    const searchQuery = removeDoubleSpaces(searchInput.value.trim());
+    if (searchQuery !== "") {
+      stops.forEach((stop) => (stop.visible = true));
+      cancelSearchBtn.setAttribute("class", "hidden");
+      searchInput.value = "";
+    }
+  });
 }
 
 function renderClosestStops(stops) {
   closestStopsContainer.innerHTML = "";
 
   stops.forEach((stop) => {
-    const stopName = extractName(stop.name);
-    const stopID = stop.extId;
-    const li = document.createElement("li");
-    li.innerText = stopName;
-    li.addEventListener("click", () => {
-      save(stopNameLocalStorageKey, stopName);
-      save(stopIDLocalStorageKey, stopID);
-      setTimeout(() => {
-        redriect(timeTablePagePath);
-      }, 100);
-    });
-    closestStopsContainer.appendChild(li);
+    if (stop.visible) {
+      const stopName = extractName(stop.name);
+      const stopID = stop.extId;
+      const li = document.createElement("li");
+      li.innerText = stopName;
+      li.addEventListener("click", () => {
+        save(stopNameLocalStorageKey, stopName);
+        save(stopIDLocalStorageKey, stopID);
+        setTimeout(() => {
+          redriect(timeTablePagePath);
+        }, 100);
+      });
+      closestStopsContainer.appendChild(li);
+    }
   });
 }
 
@@ -229,6 +263,10 @@ function cleanString(str, wordToClean) {
 
 function capitalize(str) {
   return str[0].toUpperCase() + str.slice(1);
+}
+
+function removeDoubleSpaces(str) {
+  return str.replace(/\s{2,}/g, " ");
 }
 
 function redriect(path) {
