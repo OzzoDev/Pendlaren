@@ -16,6 +16,9 @@ let stops = [];
 let unsortedStops = [];
 let inputs = [];
 
+let travelFrom;
+let travelTo;
+
 document.addEventListener("DOMContentLoaded", () => {
   init();
 });
@@ -41,6 +44,7 @@ function initTravelFrom() {
     input.value = searchQuery;
     if (searchQuery !== "") {
       ul.innerHTML = "";
+      travelFrom = searchQuery;
       if (unsortedStops) {
         const filteredstops = unsortedStops.filter((stop) => stop.name.toLowerCase().startsWith(searchQuery.toLowerCase()));
 
@@ -53,11 +57,14 @@ function initTravelFrom() {
             li.innerText = name;
             li.addEventListener("click", () => {
               input.value = name;
+              travelFrom = name;
               ul.innerHTML = "";
+              travelPlan();
             });
             ul.appendChild(li);
           });
         }
+        travelPlan();
       }
     } else {
       ul.innerHTML = "";
@@ -69,6 +76,8 @@ function initTravelFrom() {
       ul.innerHTML = "";
       const stop = extractName(unsortedStops[0].name);
       input.value = stop;
+      travelFrom = stop;
+      travelPlan();
     }
   });
 
@@ -90,6 +99,7 @@ function initTravelTo() {
     input.value = searchQuery;
     if (searchQuery !== "") {
       ul.innerHTML = "";
+      travelTo = searchQuery;
       if (unsortedStops) {
         const filteredstops = unsortedStops.filter((stop) => stop.name.toLowerCase().startsWith(searchQuery.toLowerCase()));
 
@@ -102,11 +112,14 @@ function initTravelTo() {
             li.innerText = name;
             li.addEventListener("click", () => {
               input.value = name;
+              travelTo = name;
               ul.innerHTML = "";
+              travelPlan();
             });
             ul.appendChild(li);
           });
         }
+        travelPlan();
       }
     } else {
       ul.innerHTML = "";
@@ -116,6 +129,22 @@ function initTravelTo() {
     ul.innerHTML = "";
     input.value = "";
   });
+}
+
+function travelPlan() {
+  if (travelFrom && travelTo) {
+    const validStart = unsortedStops.find((stop) => extractName(stop.name.toLowerCase()) === travelFrom.toLowerCase());
+    const validEnd = unsortedStops.find((stop) => extractName(stop.name.toLowerCase()) === travelTo.toLowerCase());
+    const validRoute = validStart && validEnd;
+
+    if (validRoute) {
+      const plan = { start: validStart.name, startExtId: validStart.extId, end: validEnd.name, endExtId: validEnd.extId };
+      save("plan", plan);
+      setTimeout(() => {
+        redriect("travel.html");
+      }, 100);
+    }
+  }
 }
 
 function initSearch() {
