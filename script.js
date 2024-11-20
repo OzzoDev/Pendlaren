@@ -25,12 +25,14 @@ function init() {
   initSearch();
   initSort();
   initTravelFrom();
+  initTravelTo();
 }
 
 function initTravelFrom() {
   const container = document.getElementById("travelFrom");
   const input = container.getElementsByTagName("input")[0];
   const btn = container.getElementsByTagName("button")[0];
+  const cancelBtn = container.getElementsByTagName("button")[1];
   const ul = container.getElementsByTagName("ul")[0];
 
   inputs.push(input);
@@ -68,6 +70,51 @@ function initTravelFrom() {
       const stop = extractName(unsortedStops[0].name);
       input.value = stop;
     }
+  });
+
+  cancelBtn.addEventListener("click", () => {
+    ul.innerHTML = "";
+    input.value = "";
+  });
+}
+
+function initTravelTo() {
+  const container = document.getElementById("travelTo");
+  const input = container.getElementsByTagName("input")[0];
+  const cancelBtn = container.getElementsByTagName("button")[0];
+  const ul = container.getElementsByTagName("ul")[0];
+
+  inputs.push(input);
+  input.addEventListener("input", () => {
+    const searchQuery = removeDoubleSpaces(input.value.trim());
+    input.value = searchQuery;
+    if (searchQuery !== "") {
+      ul.innerHTML = "";
+      if (unsortedStops) {
+        const filteredstops = unsortedStops.filter((stop) => stop.name.toLowerCase().startsWith(searchQuery.toLowerCase()));
+
+        if (filteredstops && filteredstops.length > 0) {
+          let max = filteredstops.length >= 10 ? 10 : filteredstops.length;
+
+          filteredstops.slice(0, max).forEach((stop) => {
+            const name = extractName(stop.name);
+            const li = document.createElement("li");
+            li.innerText = name;
+            li.addEventListener("click", () => {
+              input.value = name;
+              ul.innerHTML = "";
+            });
+            ul.appendChild(li);
+          });
+        }
+      }
+    } else {
+      ul.innerHTML = "";
+    }
+  });
+  cancelBtn.addEventListener("click", () => {
+    ul.innerHTML = "";
+    input.value = "";
   });
 }
 
