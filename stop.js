@@ -13,6 +13,7 @@ let currentStop;
 
 document.addEventListener("DOMContentLoaded", () => {
   init();
+  console.log(new Date());
 });
 
 function init() {
@@ -75,23 +76,35 @@ async function fetchStop(stopID) {
   }
 }
 
+function assignFetchStops(stopID) {
+  fetchStop(stopID)
+    .then((stop) => {
+      currentStop = stop;
+      save(currentStopKey, { stop: currentStop, fetchAt: new Date() });
+      render(currentStop);
+    })
+    .catch((error) => {
+      console.error("Error fetching stop:", error);
+    });
+}
+
 function useFetchedStop(stopID) {
   console.log("CurrKey: ", currentStopKey);
   const loadStop = load(currentStopKey);
   if (!loadStop) {
-    fetchStop(stopID)
-      .then((stop) => {
-        currentStop = stop;
-        save(currentStopKey, currentStop);
-        render(currentStop);
-      })
-      .catch((error) => {
-        console.error("Error fetching stop:", error);
-      });
+    assignFetchStops(stopID);
   } else {
-    currentStop = loadStop;
-    console.log("Data loaded", currentStop);
-    render(currentStop);
+    const reFetch = compareWithTempDate(new Date(), loadStop.fetchAt, 20);
+    if (reFetch) {
+      console.log("Data refetched");
+      assignFetchStops(stopID);
+    } else {
+      currentStop = loadStop;
+      console.log("Data loaded", currentStop);
+      setTimeout(() => {
+        render(currentStop.stop);
+      }, 100);
+    }
   }
 }
 
@@ -119,6 +132,15 @@ function extractBus(str) {
 
 function redriect(path) {
   window.location.href = path;
+}
+
+function compareWithTempDate(date1, date2, timeLimitInSeconds) {
+  const d1 = new Date(date1);
+  const d2 = new Date(date2);
+  const tempDate = new Date(d2);
+  tempDate.setSeconds(tempDate.getSeconds() + timeLimitInSeconds);
+
+  return d1 > tempDate;
 }
 
 function save(key, value) {
