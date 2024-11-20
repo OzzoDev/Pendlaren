@@ -31,9 +31,7 @@ function init() {
 function render(stop) {
   timeTable.innerHTML = "";
 
-  const depatures = stop.Departure;
-
-  depatures.forEach((depature) => {
+  stop.forEach((depature) => {
     const li = document.createElement("li");
     const timeEl = document.createElement("p");
     const dateEl = document.createElement("p");
@@ -41,7 +39,7 @@ function render(stop) {
     const directionEl = document.createElement("p");
 
     const time = extractDepatureTime(depature.time);
-    const date = extractDate(depature.JourneyDetailRef.ref);
+    const date = extractDate(depature.date);
     const bus = extractBus(depature.name);
     const direction = extractDirection(depature.direction);
 
@@ -79,7 +77,13 @@ async function fetchStop(stopID) {
 function assignFetchStops(stopID) {
   fetchStop(stopID)
     .then((stop) => {
-      currentStop = stop;
+      currentStop = stop.Departure.map((stop) => {
+        const time = stop.time;
+        const date = stop.JourneyDetailRef.ref;
+        const name = stop.name;
+        const direction = stop.direction;
+        return { time: time, date: date, name: name, direction: direction };
+      });
       save(currentStopKey, { stop: currentStop, fetchAt: new Date() });
       render(currentStop);
     })
@@ -89,12 +93,11 @@ function assignFetchStops(stopID) {
 }
 
 function useFetchedStop(stopID) {
-  console.log("CurrKey: ", currentStopKey);
   const loadStop = load(currentStopKey);
   if (!loadStop) {
     assignFetchStops(stopID);
   } else {
-    const reFetch = compareWithTempDate(new Date(), loadStop.fetchAt, 20);
+    const reFetch = compareWithTempDate(new Date(), loadStop.fetchAt, 60);
     if (reFetch) {
       console.log("Data refetched");
       assignFetchStops(stopID);
