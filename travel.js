@@ -1,8 +1,10 @@
 const apiKey = "c1f80921-2d9d-484a-b297-a221cdd62746";
 const travelPlan = load("plan");
+let startExtId;
+let endExtId;
 const routesContainer = document.getElementById("routes");
 
-const routesLocalStorageKey = "routes";
+const routeLocalStorageKey = "route";
 
 let currentRoutes = [];
 
@@ -12,6 +14,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function init() {
   useFetchedRoutes();
+  startExtId = travelPlan.startExtId;
+  endExtId = travelPlan.endExtId;
   console.log("Travel plan: ", travelPlan);
 }
 
@@ -21,12 +25,20 @@ function renderRoutes(routes) {
     routes.forEach((route) => {
       const li = document.createElement("li");
       const contentContainer = document.createElement("div");
+      const routeHeading = document.createElement("div");
+
       const routeInfoContainer = document.createElement("div");
       const destContainer = document.createElement("div");
       const routeChangesContainer = document.createElement("div");
       const buyTicketBtn = document.createElement("button");
 
+      const routeHeader = document.createElement("h2");
+      const travelTimeContainer = document.createElement("div");
+      const travelTime = document.createElement("p");
+      const travelDuration = document.createElement("p");
+
       contentContainer.setAttribute("class", "contentContainer");
+      routeHeading.setAttribute("class", "routeHeading");
       routeInfoContainer.setAttribute("class", "routeInfoContainer");
       destContainer.setAttribute("class", "destContainer");
       routeChangesContainer.setAttribute("class", "routeChangesContainer");
@@ -34,6 +46,41 @@ function renderRoutes(routes) {
       // const origin = document.createElement("p");
       // origin.innerText = travelPlan.start;
       // destContainer.appendChild(origin);
+
+      let startTime;
+      let endTime;
+
+      if (route) {
+        if (route.length <= 1) {
+          const routeData = route[0];
+          startTime = routeData.Origin.time;
+          endTime = routeData.Destination.time;
+        } else {
+          const routeStartData = route[0];
+          const routeEndData = route[route.length - 1];
+          startTime = routeStartData.Origin.time;
+          endTime = routeEndData.Destination.time;
+        }
+      }
+
+      routeHeader.innerText = "Lilljansberget";
+      travelTimeContainer.setAttribute("class", "travelTimeContainer");
+      console.log("Rrr: ", route);
+      if (startTime && endTime) {
+        const extractedStartTime = extractTravelTime(travelTime, startTime, endTime).startTime;
+        const extractedEndTime = extractTravelTime(travelTime, startTime, endTime).endTime;
+        const extractedDuration = timeDifference(extractedStartTime, extractedEndTime);
+
+        travelTime.innerText = `${extractedStartTime} - ${extractedEndTime}`;
+        travelDuration.innerText = extractedDuration;
+      }
+
+      travelDuration.setAttribute("class", "badge badgePrimary");
+
+      routeHeading.appendChild(routeHeader);
+      travelTimeContainer.appendChild(travelTime);
+      travelTimeContainer.appendChild(travelDuration);
+      routeHeading.appendChild(travelTimeContainer);
 
       renderRouteOrder(destContainer, route, travelPlan.start);
       renderRouteOrder(routeChangesContainer, route, 1);
@@ -43,18 +90,14 @@ function renderRoutes(routes) {
 
       route.forEach((leg) => {
         const dest = leg.Destination.name;
-        // const destionation = document.createElement("p");
-        // destionation.innerText = dest;
-        // destContainer.appendChild(destionation);
         renderRouteOrder(destContainer, route, dest);
-
         renderRouteOrder(routeChangesContainer, route, 1);
-        console.log("leg", leg);
       });
 
       routeInfoContainer.appendChild(destContainer);
       routeInfoContainer.appendChild(routeChangesContainer);
       routesContainer.appendChild(routeInfoContainer);
+      contentContainer.appendChild(routeHeading);
       contentContainer.appendChild(routeInfoContainer);
       contentContainer.appendChild(buyTicketBtn);
       li.appendChild(contentContainer);
@@ -104,8 +147,9 @@ function assignFetchedRoutes() {
     const endID = travelPlan.endExtId;
     fetchRoutes(startID, endID).then((routes) => {
       if (routes) {
+        const currentKey = `${routeLocalStorageKey}${startExtId}${endExtId}`;
         currentRoutes = routes.Trip.map((route) => route.LegList.Leg);
-        save(routesLocalStorageKey, { routes: currentRoutes, fetchAt: new Date() });
+        save(currentKey, { routes: currentRoutes, fetchAt: new Date() });
         renderRoutes(currentRoutes);
       }
     });
@@ -113,7 +157,7 @@ function assignFetchedRoutes() {
 }
 
 function useFetchedRoutes() {
-  const loadRoutes = load(routesLocalStorageKey);
+  const loadRoutes = load(routeLocalStorageKey);
   if (!loadRoutes) {
     assignFetchedRoutes();
     console.log("Data fetched");
@@ -139,6 +183,46 @@ function compareWithTempDate(date1, date2, timeLimitInSeconds) {
   tempDate.setSeconds(tempDate.getSeconds() + timeLimitInSeconds);
 
   return d1 > tempDate;
+}
+
+function extractTravelTime(element, start, end) {
+  if (start && end) {
+    const startTimeParts = start.split(":");
+    const startTime = `${startTimeParts[0]}:${startTimeParts[1]}`;
+
+    const endTimeParts = end.split(":");
+    const endTime = `${endTimeParts[0]}:${endTimeParts[1]}`;
+    return {
+      startTime: startTime,
+      endTime: endTime,
+    };
+  } else {
+    element.setAttribute("class", "hidden");
+    return "";
+  }
+}
+
+function timeDifference(start, end) {
+  const startTime = new Date(`1970-01-01T${start}:00`);
+  const endTime = new Date(`1970-01-01T${end}:00`);
+
+  const diffInMs = endTime - startTime;
+
+  if (diffInMs < 0) {
+    return "";
+  }
+
+  const hours = Math.floor(diffInMs / (1000 * 60 * 60));
+  const minutes = Math.floor((diffInMs % (1000 * 60 * 60)) / (1000 * 60));
+
+  let result = "";
+  if (hours > 0) {
+    result += `${hours}h`;
+  }
+  if (minutes > 0) {
+    result += (result ? " " : "") + `${minutes}min`;
+  }
+  return result || "";
 }
 
 function redriect(path) {

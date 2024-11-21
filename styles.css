@@ -43,6 +43,28 @@ body {
   background-color: rgb(212, 216, 212);
 }
 
+.routeHeading {
+  width: 100%;
+  padding: 0 0 20px 0;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid black;
+}
+
+.travelTimeContainer {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.routeHeading h2 {
+  font-size: 1.8rem;
+}
+
+.routeHeading p {
+  font-size: 1.3rem;
+}
+
 .routesUl .destContainer {
   width: 100%;
   padding: 0 20px 20px 20px;
@@ -114,4 +136,17 @@ body {
 
 .btnPrimary .hidden {
   display: none;
+}
+
+.badge {
+  padding: 8px;
+  border-radius: 8px;
+  background-color: rgb(187, 190, 187);
+}
+
+@media (max-width: 475px) {
+  .routeHeading {
+    flex-direction: column;
+    row-gap: 10px;
+  }
 }
