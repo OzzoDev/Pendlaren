@@ -1,6 +1,7 @@
 const apiKey = "c1f80921-2d9d-484a-b297-a221cdd62746";
 const travelPlan = load("plan");
 const routesContainer = document.getElementById("routes");
+const header = document.getElementById("header");
 const routeLocalStorageKey = "route";
 const startPagePath = "index.html";
 
@@ -19,7 +20,6 @@ document.addEventListener("DOMContentLoaded", () => {
 function init() {
   loadTravelPlanValues();
   useFetchedRoutes();
-  console.log("Travel plan: ", travelPlan);
 }
 
 function loadTravelPlanValues() {
@@ -89,8 +89,10 @@ function renderRoutes(routes) {
       travelTimeContainer.appendChild(travelDuration);
       routeHeading.appendChild(travelTimeContainer);
 
+      const dirFlag = route.find((route) => route.directionFlag).directionFlag;
+
       renderRouteOrder(destContainer, route, travelPlan.start);
-      renderRouteOrder(routeChangesContainer, route, 1);
+      renderRouteOrder(routeChangesContainer, route, dirFlag);
 
       buyTicketBtn.innerText = "Köp biljett";
       buyTicketBtn.setAttribute("class", "btn btnPrimary");
@@ -106,13 +108,12 @@ function renderRoutes(routes) {
 
       route.forEach((leg) => {
         const dest = leg.Destination.name;
-        renderRouteOrder(destContainer, route, dest);
-        renderRouteOrder(routeChangesContainer, route, 1);
+        renderRouteOrder(destContainer, route, removeFirstWord(dest));
+        renderRouteOrder(routeChangesContainer, route, dirFlag);
       });
 
       routeInfoContainer.appendChild(destContainer);
       routeInfoContainer.appendChild(routeChangesContainer);
-      routesContainer.appendChild(routeInfoContainer);
       contentContainer.appendChild(routeHeading);
       contentContainer.appendChild(routeInfoContainer);
       contentContainer.appendChild(buyTicketBtn);
@@ -162,29 +163,33 @@ function assignFetchedRoutes() {
     const startID = travelPlan.startExtId;
     const endID = travelPlan.endExtId;
     fetchRoutes(startID, endID).then((routes) => {
-      if (routes) {
+      if (routes.Trip) {
         currentRoutes = routes.Trip.map((route) => route.LegList.Leg);
         save(currentLocalStorageKey, { routes: currentRoutes, fetchAt: new Date() });
         renderRoutes(currentRoutes);
+      } else {
+        header.innerText = "Inga tillgängliga avgångar";
       }
     });
   }
+}
+
+function removeFirstWord(str) {
+  const wordToUse = str.split(" ");
+  return wordToUse.slice(1).join(" ");
 }
 
 function useFetchedRoutes() {
   const loadRoutes = load(currentLocalStorageKey);
   if (!loadRoutes) {
     assignFetchedRoutes();
-    console.log("Data fetched");
   } else {
     const reFetch = compareWithTempDate(new Date(), loadRoutes.fetchAt, 60);
     if (reFetch) {
       assignFetchedRoutes();
-      console.log("Routes refetched");
     } else {
       currentRoutes = loadRoutes.routes;
       setTimeout(() => {
-        console.log("Routes loaded: ", currentRoutes);
         renderRoutes(currentRoutes);
       }, 100);
     }
