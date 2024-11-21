@@ -20,10 +20,13 @@ function renderRoutes(routes) {
   if (routes) {
     routes.forEach((route) => {
       const li = document.createElement("li");
+      const contentContainer = document.createElement("div");
       const routeInfoContainer = document.createElement("div");
       const destContainer = document.createElement("div");
       const routeChangesContainer = document.createElement("div");
       const buyTicketBtn = document.createElement("button");
+
+      contentContainer.setAttribute("class", "contentContainer");
       routeInfoContainer.setAttribute("class", "routeInfoContainer");
       destContainer.setAttribute("class", "destContainer");
       routeChangesContainer.setAttribute("class", "routeChangesContainer");
@@ -48,11 +51,13 @@ function renderRoutes(routes) {
         renderRouteOrder(routeChangesContainer, route, 1);
         console.log("leg", leg);
       });
+
       routeInfoContainer.appendChild(destContainer);
       routeInfoContainer.appendChild(routeChangesContainer);
       routesContainer.appendChild(routeInfoContainer);
-      li.appendChild(routeInfoContainer);
-      li.appendChild(buyTicketBtn);
+      contentContainer.appendChild(routeInfoContainer);
+      contentContainer.appendChild(buyTicketBtn);
+      li.appendChild(contentContainer);
       routesContainer.appendChild(li);
     });
   }
