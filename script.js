@@ -9,6 +9,7 @@ const stopNameLocalStorageKey = "stopName";
 const stopIDLocalStorageKey = "stopID";
 
 const timeTablePagePath = "stop.html";
+const ticketsPagePath = "tickets.html";
 
 let latitude;
 let longitude;
@@ -29,6 +30,23 @@ function init() {
   initSort();
   initTravelFrom();
   initTravelTo();
+  toggleTicketButton();
+}
+
+function toggleTicketButton() {
+  const container = document.getElementById("ticketIconContainer");
+  const ticketDisplayer = container.getElementsByTagName("p")[0];
+  const numTickets = getTicketKeys().length;
+  if (numTickets === 0) {
+    container.classList.add("hidden");
+    container.style.display = "none";
+  } else {
+    container.classList.remove("hidden");
+    container.addEventListener("click", () => {
+      redriect(ticketsPagePath);
+    });
+    ticketDisplayer.innerText = numTickets;
+  }
 }
 
 function initTravelFrom() {
@@ -422,6 +440,19 @@ function removeDoubleSpaces(str) {
 function redriect(path) {
   clearInputs();
   window.location.href = path;
+}
+
+function getTicketKeys() {
+  const ticketKeys = [];
+
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith("ticket")) {
+      ticketKeys.push(key);
+    }
+  }
+
+  return ticketKeys;
 }
 
 function save(key, value) {

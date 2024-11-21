@@ -3,7 +3,6 @@ const travelPlan = load("plan");
 const routesContainer = document.getElementById("routes");
 const routeLocalStorageKey = "route";
 const startPagePath = "index.html";
-const ticketsPagePath = "tickets.html";
 
 let currentLocalStorageKey;
 
