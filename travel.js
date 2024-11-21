@@ -2,6 +2,10 @@ const apiKey = "c1f80921-2d9d-484a-b297-a221cdd62746";
 const travelPlan = load("plan");
 const routesContainer = document.getElementById("routes");
 
+const routesLocalStorageKey = "routes";
+
+let currentRoutes = [];
+
 document.addEventListener("DOMContentLoaded", () => {
   init();
 });
@@ -21,7 +25,7 @@ function renderRoutes(routes) {
       li.innerText = travelPlan.start;
       ul.appendChild(li);
 
-      route.LegList.Leg.forEach((leg) => {
+      route.forEach((leg) => {
         const dest = leg.Destination.name;
         const li = document.createElement("li");
         li.innerText = dest;
@@ -49,17 +53,47 @@ async function fetchRoutes(originId, destId) {
   }
 }
 
-function useFetchedRoutes() {
+function assignFetchedRoutes() {
   if (travelPlan) {
     const startID = travelPlan.startExtId;
     const endID = travelPlan.endExtId;
     fetchRoutes(startID, endID).then((routes) => {
       if (routes) {
-        console.log("Routes from promise: ", routes);
-        renderRoutes(routes.Trip);
+        currentRoutes = routes.Trip.map((route) => route.LegList.Leg);
+        save(routesLocalStorageKey, { routes: currentRoutes, fetchAt: new Date() });
+        renderRoutes(currentRoutes);
       }
     });
   }
+}
+
+function useFetchedRoutes() {
+  const loadRoutes = load(routesLocalStorageKey);
+  if (!loadRoutes) {
+    assignFetchedRoutes();
+    console.log("Data fetched");
+  } else {
+    const reFetch = compareWithTempDate(new Date(), loadRoutes.fetchAt, 60);
+    if (reFetch) {
+      assignFetchedRoutes();
+      console.log("Routes refetched");
+    } else {
+      currentRoutes = loadRoutes.routes;
+      setTimeout(() => {
+        console.log("Routes loaded: ", currentRoutes);
+        renderRoutes(currentRoutes);
+      }, 100);
+    }
+  }
+}
+
+function compareWithTempDate(date1, date2, timeLimitInSeconds) {
+  const d1 = new Date(date1);
+  const d2 = new Date(date2);
+  const tempDate = new Date(d2);
+  tempDate.setSeconds(tempDate.getSeconds() + timeLimitInSeconds);
+
+  return d1 > tempDate;
 }
 
 function redriect(path) {

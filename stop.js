@@ -73,7 +73,7 @@ async function fetchStop(stopID) {
   }
 }
 
-function assignFetchStops(stopID) {
+function assignFetchedStops(stopID) {
   fetchStop(stopID)
     .then((stop) => {
       if (stop && stop.Departure) {
@@ -99,12 +99,12 @@ function assignFetchStops(stopID) {
 function useFetchedStop(stopID) {
   const loadStop = load(currentStopKey);
   if (!loadStop) {
-    assignFetchStops(stopID);
+    assignFetchedStops(stopID);
   } else {
     const reFetch = compareWithTempDate(new Date(), loadStop.fetchAt, 60);
     if (reFetch) {
       console.log("Data refetched");
-      assignFetchStops(stopID);
+      assignFetchedStops(stopID);
     } else {
       currentStop = loadStop;
       console.log("Data loaded", currentStop);
