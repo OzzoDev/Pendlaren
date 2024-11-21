@@ -38,7 +38,8 @@ function render(stop) {
     const directionEl = document.createElement("p");
 
     const time = extractDepatureTime(depature.time);
-    const date = extractDate(depature.date);
+    const date = formatDate(extractDate(depature.date));
+    console.log(depature.name);
     const bus = extractBus(depature.name);
     const direction = extractDirection(depature.direction);
 
@@ -115,6 +116,13 @@ function useFetchedStop(stopID) {
   }
 }
 
+function formatDate(date) {
+  const day = date[0] + date[1];
+  const month = date[2] + date[3];
+  const year = date.slice(4);
+  return `${day}/${month}/${year}`;
+}
+
 function extractName(name) {
   return name.split(".")[0].split(" (")[0];
 }
@@ -134,7 +142,10 @@ function extractDirection(str) {
 }
 
 function extractBus(str) {
-  return str.split("- ")[1].split(" ")[1];
+  if (str.includes(" - ")) {
+    return str.split("- ")[1].split(" ")[1];
+  }
+  return str;
 }
 
 function redriect(path) {
