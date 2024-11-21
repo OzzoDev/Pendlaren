@@ -2,6 +2,7 @@ const apiKey = "c1f80921-2d9d-484a-b297-a221cdd62746";
 const travelPlan = load("plan");
 let startExtId;
 let endExtId;
+let startName;
 const routesContainer = document.getElementById("routes");
 
 const routeLocalStorageKey = "route";
@@ -14,9 +15,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function init() {
   useFetchedRoutes();
-  startExtId = travelPlan.startExtId;
-  endExtId = travelPlan.endExtId;
+  loadTravelPlanValues();
   console.log("Travel plan: ", travelPlan);
+}
+
+function loadTravelPlanValues() {
+  if (travelPlan) {
+    startExtId = travelPlan.startExtId;
+    endExtId = travelPlan.endExtId;
+    startName = travelPlan.start;
+  }
 }
 
 function renderRoutes(routes) {
@@ -43,10 +51,6 @@ function renderRoutes(routes) {
       destContainer.setAttribute("class", "destContainer");
       routeChangesContainer.setAttribute("class", "routeChangesContainer");
 
-      // const origin = document.createElement("p");
-      // origin.innerText = travelPlan.start;
-      // destContainer.appendChild(origin);
-
       let startTime;
       let endTime;
 
@@ -63,9 +67,8 @@ function renderRoutes(routes) {
         }
       }
 
-      routeHeader.innerText = "Lilljansberget";
+      routeHeader.innerText = startName;
       travelTimeContainer.setAttribute("class", "travelTimeContainer");
-      console.log("Rrr: ", route);
       if (startTime && endTime) {
         const extractedStartTime = extractTravelTime(travelTime, startTime, endTime).startTime;
         const extractedEndTime = extractTravelTime(travelTime, startTime, endTime).endTime;
