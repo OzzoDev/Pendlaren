@@ -4,35 +4,91 @@
   box-sizing: border-box;
 }
 
+body {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+}
+
 .routesUl {
+  width: min(100%, 700px);
   margin-top: 100px;
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 20px;
 }
 
 .routesUl li {
+  width: 100%;
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 20px;
   padding: 20px;
-  background-color: red;
+  border-radius: 16px;
+  background-color: rgb(187, 190, 187);
 }
 
 .routesUl .destContainer {
-  padding: 20px;
+  width: 100%;
+  padding: 0 20px 20px 20px;
   font-size: 1.3rem;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  background-color: red;
 }
 
 .routesUl .routeInfoContainer {
+  width: 100%;
   padding: 20px;
   display: flex;
-  gap: 20px;
-  background-color: green;
+  justify-content: space-between;
+  border-radius: 8px;
+  background-color: rgb(212, 216, 212);
+}
+
+.routesUl .destContainer {
+  gap: 10px;
+}
+
+.routesUl .destContainer div {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.routesUl .routeChangesContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.routesUl .routeChangesContainer div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.routesUl .routeChangesContainer div p,
+.routesUl .destContainer div p {
+  font-size: 1.6rem;
+}
+
+.icon {
+  width: 32px;
+}
+
+.btn {
+  width: fit-content;
+  padding: 10px 20px;
+  border: 0;
+  outline: none;
+  border-radius: 8px;
 }
 
 .hidden {

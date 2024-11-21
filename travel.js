@@ -22,26 +22,59 @@ function renderRoutes(routes) {
       const li = document.createElement("li");
       const routeInfoContainer = document.createElement("div");
       const destContainer = document.createElement("div");
+      const routeChangesContainer = document.createElement("div");
+      const buyTicketBtn = document.createElement("button");
       routeInfoContainer.setAttribute("class", "routeInfoContainer");
       destContainer.setAttribute("class", "destContainer");
+      routeChangesContainer.setAttribute("class", "routeChangesContainer");
 
-      const origin = document.createElement("p");
-      origin.innerText = travelPlan.start;
-      destContainer.appendChild(origin);
+      // const origin = document.createElement("p");
+      // origin.innerText = travelPlan.start;
+      // destContainer.appendChild(origin);
+
+      renderRouteOrder(destContainer, route, travelPlan.start);
+      renderRouteOrder(routeChangesContainer, route, 1);
+
+      buyTicketBtn.innerText = "Köp biljett";
+      buyTicketBtn.setAttribute("class", "btn btnPrimary");
 
       route.forEach((leg) => {
         const dest = leg.Destination.name;
-        const destionation = document.createElement("p");
-        destionation.innerText = dest;
-        destContainer.appendChild(destionation);
+        // const destionation = document.createElement("p");
+        // destionation.innerText = dest;
+        // destContainer.appendChild(destionation);
+        renderRouteOrder(destContainer, route, dest);
+
+        renderRouteOrder(routeChangesContainer, route, 1);
         console.log("leg", leg);
       });
       routeInfoContainer.appendChild(destContainer);
+      routeInfoContainer.appendChild(routeChangesContainer);
       routesContainer.appendChild(routeInfoContainer);
       li.appendChild(routeInfoContainer);
-      routesContainer.appendChild(routeInfoContainer);
+      li.appendChild(buyTicketBtn);
+      routesContainer.appendChild(li);
     });
   }
+}
+
+function renderRouteOrder(parent, routes, text) {
+  const container = document.createElement("div");
+  const flag = document.createElement("p");
+  let arrowIcon;
+  if (parent.children.length < routes.length) {
+    arrowIcon = document.createElement("img");
+    arrowIcon.setAttribute("src", "/icons/downArrow.svg");
+    arrowIcon.setAttribute("alt", "Byte av buss");
+    arrowIcon.setAttribute("class", "icon downArrowIcon");
+  }
+
+  flag.innerText = text;
+  container.appendChild(flag);
+  if (arrowIcon) {
+    container.appendChild(arrowIcon);
+  }
+  parent.appendChild(container);
 }
 
 async function fetchRoutes(originId, destId) {
