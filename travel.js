@@ -5,6 +5,8 @@ const routeLocalStorageKey = "route";
 const startPagePath = "index.html";
 const ticketsPagePath = "tickets.html";
 
+let currentLocalStorageKey;
+
 let startExtId;
 let endExtId;
 let startName;
@@ -16,8 +18,8 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function init() {
-  useFetchedRoutes();
   loadTravelPlanValues();
+  useFetchedRoutes();
   console.log("Travel plan: ", travelPlan);
 }
 
@@ -26,6 +28,7 @@ function loadTravelPlanValues() {
     startExtId = travelPlan.startExtId;
     endExtId = travelPlan.endExtId;
     startName = travelPlan.start;
+    currentLocalStorageKey = `${routeLocalStorageKey}${startExtId}${endExtId}`;
   }
 }
 
@@ -93,10 +96,13 @@ function renderRoutes(routes) {
       buyTicketBtn.innerText = "Köp biljett";
       buyTicketBtn.setAttribute("class", "btn btnPrimary");
       buyTicketBtn.addEventListener("click", () => {
-        //save ticket
-        setTimeout(() => {
-          redriect(startPagePath);
-        }, 100);
+        if (startTime && endTime) {
+          let ticketLocalStorageKey = `ticket${currentLocalStorageKey}${startTime}${endTime}`;
+          save(ticketLocalStorageKey, { route: route, boughtAt: new Date() });
+          setTimeout(() => {
+            redriect(startPagePath);
+          }, 100);
+        }
       });
 
       route.forEach((leg) => {
@@ -158,9 +164,8 @@ function assignFetchedRoutes() {
     const endID = travelPlan.endExtId;
     fetchRoutes(startID, endID).then((routes) => {
       if (routes) {
-        const currentKey = `${routeLocalStorageKey}${startExtId}${endExtId}`;
         currentRoutes = routes.Trip.map((route) => route.LegList.Leg);
-        save(currentKey, { routes: currentRoutes, fetchAt: new Date() });
+        save(currentLocalStorageKey, { routes: currentRoutes, fetchAt: new Date() });
         renderRoutes(currentRoutes);
       }
     });
@@ -168,7 +173,7 @@ function assignFetchedRoutes() {
 }
 
 function useFetchedRoutes() {
-  const loadRoutes = load(routeLocalStorageKey);
+  const loadRoutes = load(currentLocalStorageKey);
   if (!loadRoutes) {
     assignFetchedRoutes();
     console.log("Data fetched");
