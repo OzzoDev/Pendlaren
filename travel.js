@@ -1,11 +1,13 @@
 const apiKey = "c1f80921-2d9d-484a-b297-a221cdd62746";
 const travelPlan = load("plan");
+const routesContainer = document.getElementById("routes");
+const routeLocalStorageKey = "route";
+const startPagePath = "index.html";
+const ticketsPagePath = "tickets.html";
+
 let startExtId;
 let endExtId;
 let startName;
-const routesContainer = document.getElementById("routes");
-
-const routeLocalStorageKey = "route";
 
 let currentRoutes = [];
 
@@ -90,6 +92,12 @@ function renderRoutes(routes) {
 
       buyTicketBtn.innerText = "Köp biljett";
       buyTicketBtn.setAttribute("class", "btn btnPrimary");
+      buyTicketBtn.addEventListener("click", () => {
+        //save ticket
+        setTimeout(() => {
+          redriect(startPagePath);
+        }, 100);
+      });
 
       route.forEach((leg) => {
         const dest = leg.Destination.name;
@@ -229,7 +237,6 @@ function timeDifference(start, end) {
 }
 
 function redriect(path) {
-  clearInputs();
   window.location.href = path;
 }
 
