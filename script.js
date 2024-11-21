@@ -1,5 +1,4 @@
 const apiKey = "c1f80921-2d9d-484a-b297-a221cdd62746";
-const output = document.getElementById("output");
 const closestStopsContainer = document.getElementById("closestStopsContainer");
 
 const latitudeLocalStorageKey = "latitude";
@@ -208,7 +207,7 @@ function initSort() {
     btn.addEventListener("click", () => {
       switch (index) {
         case 0:
-          stops = unsortedStops;
+          reloadStops();
           break;
         case 1:
           stops = stops.sort((a, b) => a.name.localeCompare(b.name));
@@ -243,8 +242,6 @@ function renderClosestStops(stops) {
 function getLocation() {
   if ("geolocation" in navigator) {
     navigator.geolocation.getCurrentPosition(success, error);
-  } else {
-    output.textContent = "Geolocation is not supported by this browser.";
   }
 }
 
@@ -263,7 +260,6 @@ function success(position) {
     save(longitudeLocalStorageKey, longitude);
   }
 
-  output.textContent = `Latitude: ${latitude}, Longitude: ${longitude}`;
   useFetchedStops(loadLatitude, loadLongitude);
 }
 
@@ -385,6 +381,14 @@ function findClosestStops(latitude, longitude, stops) {
 
 function extractName(name) {
   return name.split(".")[0].split(" (")[0];
+}
+
+function reloadStops() {
+  if (latitude && longitude) {
+    const loadStops = load(stopsLocalStorageKey);
+    stops = modifyStopsArray(findClosestStops(latitude, longitude, loadStops));
+    unsortedStops = stops;
+  }
 }
 
 function modifyStopsArray(stops) {

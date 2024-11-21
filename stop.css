@@ -1,0 +1,67 @@
+h1,
+h2 {
+  color: #444;
+  text-align: center;
+}
+
+h1 {
+  margin-bottom: 20px;
+}
+
+h2 {
+  margin-top: 30px;
+  margin-bottom: 10px;
+}
+
+#timeTable {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+#timeTable li {
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+  margin: 10px 0;
+  transition: background-color 0.3s, transform 0.2s;
+  cursor: pointer;
+}
+
+#timeTable li:hover {
+  background-color: #f0f0f0;
+  transform: translateY(-2px);
+}
+
+#stop {
+  font-size: 1.5em;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 600px) {
+  body {
+    padding: 10px;
+  }
+
+  #timeTable li {
+    padding: 10px;
+    font-size: 0.9em;
+  }
+}
+
+@media (min-width: 768px) {
+  #timeTable {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1440px) {
+  #timeTable {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}

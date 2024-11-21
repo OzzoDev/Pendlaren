@@ -128,7 +128,7 @@ function renderTickets(tickets) {
       travelTimeContainer.appendChild(travelDuration);
       routeHeading.appendChild(travelTimeContainer);
 
-      const dirFlag = ticket.ticket.find((flag) => flag.directionFlag).directionFlag;
+      const dirFlag = ticket.ticket.find((flag) => flag.number).number;
 
       renderRouteOrder(destContainer, ticket.ticket, travelPlan.start);
 

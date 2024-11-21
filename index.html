@@ -10,13 +10,11 @@
     <script src="common.js" defer></script>
   </head>
   <body>
-    <h1>Pendlaren</h1>
     <img src="/icons/moon.svg" alt="Ändra till mörkt läge" title="Ändra till mörkt läge" class="themeToggle icon" />
     <div id="ticketIconContainer" class="badge badgeRound" title="Se dina biljetter">
       <p id="numTickets"></p>
       <img src="/icons/ticket.svg" alt="Dina biljetter" class="icon viewTickets" />
     </div>
-    <p id="output"></p>
     <div id="travelFrom">
       <h2>Res från</h2>
       <div>
@@ -39,10 +37,10 @@
       <button id="cancelSearchBtn" class="hidden">Avbryt</button>
     </div>
     <div id="sortContainer">
-      <input type="radio" name="sortBtn" checked />
-      <label for="">Närmast</label>
-      <input type="radio" name="sortBtn" />
-      <label for="">A-Ö</label>
+      <input type="radio" name="sortBtn" id="closet" checked />
+      <label for="closet">Närmast</label>
+      <input type="radio" name="sortBtn" id="az" />
+      <label for="az">A-Ö</label>
     </div>
     <div>
       <h2>Tillgängliga hållplater</h2>

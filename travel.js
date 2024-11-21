@@ -33,6 +33,7 @@ function loadTravelPlanValues() {
 
 function renderRoutes(routes) {
   routesContainer.innerHTML = "";
+
   if (routes) {
     routes.forEach((route) => {
       const li = document.createElement("li");
@@ -89,7 +90,7 @@ function renderRoutes(routes) {
       travelTimeContainer.appendChild(travelDuration);
       routeHeading.appendChild(travelTimeContainer);
 
-      const dirFlag = route.find((route) => route.directionFlag).directionFlag;
+      const dirFlag = route.find((route) => route.number).number;
 
       renderRouteOrder(destContainer, route, travelPlan.start);
       renderRouteOrder(routeChangesContainer, route, dirFlag);
