@@ -1,3 +1,40 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.routesUl {
+  margin-top: 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.routesUl li {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  background-color: red;
+}
+
+.routesUl .destContainer {
+  padding: 20px;
+  font-size: 1.3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background-color: red;
+}
+
+.routesUl .routeInfoContainer {
+  padding: 20px;
+  display: flex;
+  gap: 20px;
+  background-color: green;
+}
+
 .hidden {
   display: none;
 }

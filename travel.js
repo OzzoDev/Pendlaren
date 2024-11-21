@@ -19,20 +19,27 @@ function renderRoutes(routes) {
   routesContainer.innerHTML = "";
   if (routes) {
     routes.forEach((route) => {
-      const ul = document.createElement("ul");
-
       const li = document.createElement("li");
-      li.innerText = travelPlan.start;
-      ul.appendChild(li);
+      const routeInfoContainer = document.createElement("div");
+      const destContainer = document.createElement("div");
+      routeInfoContainer.setAttribute("class", "routeInfoContainer");
+      destContainer.setAttribute("class", "destContainer");
+
+      const origin = document.createElement("p");
+      origin.innerText = travelPlan.start;
+      destContainer.appendChild(origin);
 
       route.forEach((leg) => {
         const dest = leg.Destination.name;
-        const li = document.createElement("li");
-        li.innerText = dest;
-        ul.appendChild(li);
+        const destionation = document.createElement("p");
+        destionation.innerText = dest;
+        destContainer.appendChild(destionation);
         console.log("leg", leg);
       });
-      routesContainer.appendChild(ul);
+      routeInfoContainer.appendChild(destContainer);
+      routesContainer.appendChild(routeInfoContainer);
+      li.appendChild(routeInfoContainer);
+      routesContainer.appendChild(routeInfoContainer);
     });
   }
 }
