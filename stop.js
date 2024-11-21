@@ -39,7 +39,6 @@ function render(stop) {
 
     const time = extractDepatureTime(depature.time);
     const date = formatDate(extractDate(depature.date));
-    console.log(depature.name);
     const bus = extractBus(depature.name);
     const direction = extractDirection(depature.direction);
 

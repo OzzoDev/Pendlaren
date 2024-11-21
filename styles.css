@@ -21,6 +21,12 @@ h1 {
   font-size: 3rem;
 }
 
+.themeToggle {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
 #backToIndex {
   cursor: pointer;
   position: absolute;
@@ -74,4 +80,13 @@ h1 {
 
 .hidden {
   display: none;
+}
+
+.light-mode {
+  filter: invert(-1);
+}
+
+.dark-mode {
+  background-color: black;
+  filter: invert(1);
 }
